@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوت يوسف للعقارات 🏠</title>
+    <style>
+        body {
+            font-family: "Cairo", sans-serif;
+            background: #f1f1f1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .chat-box {
+            width: 400px;
+            height: 500px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 0 10px #ccc;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        .message {
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .user {
+            background: #007bff;
+            color: white;
+            align-self: flex-end;
+        }
+        .bot {
+            background: #e9ecef;
+            align-self: flex-start;
+        }
+        form {
+            display: flex;
+            border-top: 1px solid #ddd;
+        }
+        input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            outline: none;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h2>💬 يوسف بوت العقارات</h2>
+    <div class="chat-box">
+        <div class="messages" id="messages"></div>
+        <form id="chatForm">
+            <input type="text" id="userInput" placeholder="اكتب رسالتك هنا..." required>
+            <button type="submit">إرسال</button>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('chatForm');
+        const messagesDiv = document.getElementById('messages');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userInput = document.getElementById('userInput');
+            const messageText = userInput.value.trim();
+            if (!messageText) return;
+
+            // رسالة المستخدم
+            const userMsg = document.createElement('div');
+            userMsg.className = 'message user';
+            userMsg.textContent = messageText;
+            messagesDiv.appendChild(userMsg);
+
+            // إرسال الرسالة للسيرفر
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: messageText })
+            });
+            const data = await response.json();
+
+            // رد البوت
+            const botMsg = document.createElement('div');
+            botMsg.className = 'message bot';
+            botMsg.textContent = data.reply;
+            messagesDiv.appendChild(botMsg);
+
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            userInput.value = '';
+        });
+    </script>
+</body>
+</html>
